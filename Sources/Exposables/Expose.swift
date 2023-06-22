@@ -30,8 +30,8 @@ public protocol ExposableInterface: View {
 }
 
 extension ExposableInterface {
-    var state: Update { wrappedValue.state }
-    var updateBinding: Binding<ParameterType> {
+    public var state: Update { wrappedValue.state }
+    public var updateBinding: Binding<ParameterType> {
         Binding(
             get: { wrappedValue.wrappedValue },
             set: {
@@ -41,7 +41,7 @@ extension ExposableInterface {
         )
     }
     
-    var binding: Binding<ParameterType> {
+    public var binding: Binding<ParameterType> {
         Binding(
             get: { wrappedValue.wrappedValue },
             set: { wrappedValue.wrappedValue = $0 }

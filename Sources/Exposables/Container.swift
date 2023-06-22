@@ -7,11 +7,13 @@
 
 import SwiftUI
 
-class ExposableContainer: ObservableObject {
+public class ExposableContainer: ObservableObject {
     @Published var state = Update()
     var view: AnyView?
     
-    func compile(_ mirror: Mirror) -> some View {
+    public init() {}
+    
+    public func compile(_ mirror: Mirror) -> some View {
         if let view = view { return view }
         let vw = AnyView(mirror.stackExposedViews(mirror, state: state))
         self.view = vw
