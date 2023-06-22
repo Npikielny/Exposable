@@ -8,7 +8,7 @@
 import SwiftUI
 
 public class ExposableContainer: ObservableObject {
-    @Published var state = Update()
+    @Published public var state = Update()
     var view: AnyView?
     
     public init() {}
@@ -26,7 +26,8 @@ extension Mirror {
         let exposed = mirror.children
             .compactMap {
                 if let exposed = $0.value as? ErasedParameter {
-                    return exposed.wrapped
+                    let wrapped = exposed.wrapped
+                    return wrapped
                 }
                 return nil
             }

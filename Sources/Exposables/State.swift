@@ -10,7 +10,7 @@ import SwiftUI
 public class Update: ObservableObject {
     var id = UUID()
     
-    func send() {
+    public func send() {
         objectWillChange.send()
     }
     

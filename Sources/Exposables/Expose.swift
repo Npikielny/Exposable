@@ -5,10 +5,10 @@
 //
 import SwiftUI
 
-@propertyWrapper public class Expose<T: Exposable>: ExposedParameter {
+@propertyWrapper public class Expose<T: Exposable>: ExposedParameter, ObservableObject {
     public var wrappedValue: T
     public let id = UUID()
-    let state = Update()
+    @Published public var state = Update()
     let settings: T.Settings?
     
     public init(wrappedValue: T, settings: T.Settings? = nil) {
@@ -18,6 +18,12 @@ import SwiftUI
     
     func makeView(_ state: Update) -> some View {
         T.Interface(settings, wrappedValue: self)
+    }
+}
+
+extension Expose where T: DisplayableParameter {
+    public func display() -> some View {
+        ExposeDisplay(exposed: self)
     }
 }
 
