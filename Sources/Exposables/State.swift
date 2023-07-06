@@ -9,8 +9,14 @@ import SwiftUI
 
 public class Update: ObservableObject {
     var id = UUID()
+    weak var parent: Update?
+    
+    init(parent: Update? = nil) {
+        self.parent = parent
+    }
     
     public func send() {
+        parent?.send()
         objectWillChange.send()
     }
     

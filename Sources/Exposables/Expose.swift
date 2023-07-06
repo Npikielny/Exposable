@@ -16,7 +16,7 @@ import SwiftUI
         self.settings = settings
     }
     
-    func makeView(_ state: Update) -> some View {
+    public func makeView(_ state: Update) -> some View {
         T.Interface(settings, wrappedValue: self)
     }
 }
@@ -42,7 +42,7 @@ extension ExposableInterface {
             get: { wrappedValue.wrappedValue },
             set: {
                 wrappedValue.wrappedValue = $0
-                wrappedValue.state.objectWillChange.send()
+                wrappedValue.state.send()
             }
         )
     }
@@ -60,7 +60,7 @@ public protocol Exposable {
     associatedtype Interface: ExposableInterface where Interface.ParameterType == Self
 }
 
-struct ExposedWrapper: View {
+public struct ExposedWrapper: View {
     let id: UUID
     let input: any ExposedParameter
     @StateObject var state: Update
@@ -71,20 +71,20 @@ struct ExposedWrapper: View {
         self._state = StateObject(wrappedValue: input.state)
     }
     
-    var body: some View { AnyView(input.makeView(state)) }
+    public var body: some View { AnyView(input.makeView(state)) }
 }
 
-protocol ExposedParameter: ErasedParameter {
+public protocol ExposedParameter: ErasedParameter {
     var id: UUID { get }
     associatedtype Interface: View
     var state: Update { get }
     func makeView(_ state: Update) -> Interface
 }
 
-protocol ErasedParameter: AnyObject {
+public protocol ErasedParameter: AnyObject {
     var wrapped: ExposedWrapper { get }
 }
 
 extension ExposedParameter {
-    var wrapped: ExposedWrapper { ExposedWrapper(input: self) }
+    public var wrapped: ExposedWrapper { ExposedWrapper(input: self) }
 }
