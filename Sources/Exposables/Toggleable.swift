@@ -57,11 +57,11 @@ where Settings == ToggleSettings<Self>
 }
 
 extension ToggleExposable {
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.optionLabel == rhs.optionLabel
     }
     
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         optionLabel.hash(into: &hasher)
     }
 }

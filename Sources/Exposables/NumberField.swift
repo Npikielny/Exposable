@@ -14,7 +14,7 @@ public struct NumberField<Number: Numeric & Comparable>: View {
     @Binding var value: Number
     @Binding var preprocessed: Number
     
-    init(
+    public init(
         range: ClosedRange<Double>? = nil,
         title: String? = nil,
         value: Binding<Double>
@@ -34,7 +34,7 @@ public struct NumberField<Number: Numeric & Comparable>: View {
         })
     }
     
-    init(
+    public init(
         range: ClosedRange<Int>? = nil,
         title: String? = nil,
         value: Binding<Int>
