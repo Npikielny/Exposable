@@ -8,23 +8,20 @@
 import SwiftUI
 
 public class ExposableContainer: ObservableObject {
-    @Published public var state: Update
-    var view: AnyView?
+    @Published public var state = Update()
+    var view: AnyView? = nil
     
-    public init(parent: Update? = nil) {
-        self.state = Update(parent: parent)
-    }
+    public init() {}
     
     public func compile(_ mirror: Mirror) -> some View {
         if let view = view { return view }
-        let vw = AnyView(mirror.stackExposedViews(mirror, state))
+        let vw = AnyView(mirror.stackExposedViews(mirror))
         self.view = vw
         return vw
     }
     
     func compile(exposed: [any ExposedParameter]) -> some View {
         if let view = view { return view }
-        exposed.forEach { $0.state.parent = state }
         let vw = AnyView(VStack {
             ForEach(exposed.map(\.wrapped), id: \.id) {
                 $0
@@ -36,12 +33,11 @@ public class ExposableContainer: ObservableObject {
 }
 
 extension Mirror {
-    func stackExposedViews(_ mirror: Mirror, _ state: Update) -> some View {
+    func stackExposedViews(_ mirror: Mirror) -> some View {
         let exposed = mirror.children
             .compactMap {
                 if let exposed = $0.value as? ErasedParameter {
                     let wrapped = exposed.wrapped
-                    wrapped.state.parent = state
                     return wrapped
                 }
                 return nil

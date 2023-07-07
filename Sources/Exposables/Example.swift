@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SwiftUIView: View {
     @Expose var message: String
-    @Expose var background = ColorSelect.black
+    @Expose var color = BackgroundSelect.none
     @StateObject var container = ExposableContainer()
     
     init() {
@@ -17,40 +17,41 @@ struct SwiftUIView: View {
         self._message = exposed
     }
     
-    @ViewBuilder
-    func backgroundVStack(builder: @escaping () -> some View) -> some View {
-        VStack {
-            builder()
-        }
-        .background(background.color)
-//        if case let .select(expose) = background {
-//            VStack {
-//                builder()
-//            }
-//            .background(expose.wrappedValue.color)
-//        } else {
-//            VStack {
-//                builder()
-//            }
-//        }
-    }
-    
     var body: some View {
-        let _ = print(background)
         VStack {
             Text("Hello, World!")
             container.compile(Mirror(reflecting: self))
             Text(message)
             _message.display()
+            _color.display()
         }
         .frame(width: 500, height: 300)
-        .background(background.color)
         .padding()
     }
 }
 
-enum BackgroundSelect: ToggleExposable {
-//    typealias Settings = ToggleSettings<BackgroundSelect>
+enum BackgroundSelect: ToggleExposable, DisplayableParameter {
+    struct DisplayInterface: ExposableDisplayInterface {
+        typealias ParameterType = BackgroundSelect
+        
+        var background: BackgroundSelect
+        
+        init(_ parameter: BackgroundSelect) {
+            self.background = parameter
+        }
+        
+        @ViewBuilder
+        var body: some View {
+            switch background {
+                case .none:
+                    EmptyView()
+                case let .select(color):
+                    Circle()
+                        .foregroundColor(color.wrappedValue.color)
+            }
+        }
+    }
+    
     typealias Interface = ToggleInterface<BackgroundSelect>
 
     case none
