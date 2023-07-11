@@ -49,6 +49,7 @@ public class ExposableContainer: ObservableObject {
         case inline
         case separated
         case none
+        case onlyDisplay
     }
     
     struct ExposedWrapperSet: View {
@@ -58,22 +59,49 @@ public class ExposableContainer: ObservableObject {
         var body: some View {
             switch displayMethod {
                 case .none:
-                    ForEach(exposed, id: \.id) {
-                        $0
+                    VStack {
+                        ForEach(exposed, id: \.id) {
+                            $0
+                        }
                     }
                 case .separated:
-                    ForEach(exposed, id: \.id) {
-                        $0
-                    }
-                    Divider()
-                    ForEach(exposed, id: \.id) {
-                        if let display = $0.display { display }
+                    VStack {
+                        ForEach(exposed, id: \.id) {
+                            $0
+                        }
+                        Divider()
+                        ForEach(exposed, id: \.id) {
+                            if let display = $0.display { display }
+                        }
                     }
                 case .inline:
-                    ForEach(exposed, id: \.id) {
-                        $0
-                        if let display = $0.display { display }
+                    VStack {
+                        ForEach(exposed, id: \.id) {
+                            $0
+                            if let display = $0.display { display }
+                        }
                     }
+                case .onlyDisplay: info
+                    
+            }
+        }
+        
+        var info: some View {
+            VStack {
+                ForEach(exposed, id: \.id) {
+                    if let display = $0.display {
+                        infoView(display: display, exposed: $0)
+                    }
+                }
+            }
+        }
+        
+        func infoView(display: AnyView, exposed: ExposedWrapper) -> some View {
+            HStack {
+                if let title = exposed.title {
+                    Text(title)
+                }
+                display
             }
         }
     }

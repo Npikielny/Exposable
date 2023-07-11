@@ -71,6 +71,7 @@ public struct ExposedWrapper: View {
     let id: UUID
     let input: any ExposedParameter
     @StateObject var state: Update
+    var title: String? { input.title }
     
     init(input: any ExposedParameter) {
         self.id = input.id
@@ -84,6 +85,7 @@ public struct ExposedWrapper: View {
 
 public protocol ExposedParameter: ErasedParameter {
     var id: UUID { get }
+    var title: String? { get }
     associatedtype Interface: View
     var state: Update { get }
     func makeView() -> Interface

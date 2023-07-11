@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol NumericExposable: Comparable & Numeric & Exposable {
+public protocol NumericExposable: Comparable & Numeric & Exposable, DisplayableParameter {
     static func numberField(settings: Settings?, title: String?, value: Binding<Self>) -> NumberField<Self>
 }
 
@@ -29,6 +29,17 @@ public struct NumberFieldInterface<ParameterType: NumericExposable>: ExposableIn
 }
 
 extension Double: NumericExposable {
+    public struct DisplayInterface: ExposableDisplayInterface {
+        var parameter: Double
+        public init(_ parameter: Double) {
+            self.parameter = parameter
+        }
+        
+        public var body: some View {
+            Text("\(parameter)")
+        }
+    }
+    
     public static func numberField(settings: Settings?, title: String?, value: Binding<Double>) -> NumberField<Double> {
         NumberField(range: settings, title: title, value: value)
     }
@@ -38,6 +49,17 @@ extension Double: NumericExposable {
 }
 
 extension Int: NumericExposable {
+    public struct DisplayInterface: ExposableDisplayInterface {
+        var parameter: Int
+        public init(_ parameter: Int) {
+            self.parameter = parameter
+        }
+        
+        public var body: some View {
+            Text("\(parameter)")
+        }
+    }
+    
     public static func numberField(settings: Settings?, title: String?, value: Binding<Int>) -> NumberField<Int> {
         NumberField(range: settings, title: title, value: value)
     }
