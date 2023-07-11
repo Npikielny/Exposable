@@ -6,33 +6,34 @@
 import SwiftUI
 
 @propertyWrapper public class Expose<T: Exposable>: ExposedParameter, ObservableObject {
+    public let title: String?
     public var wrappedValue: T
     public let id = UUID()
     @Published public var state = Update()
     let settings: T.Settings?
     
-    public init(wrappedValue: T, settings: T.Settings? = nil) {
+    public init(wrappedValue: T, title: String? = nil, settings: T.Settings? = nil) {
         self.wrappedValue = wrappedValue
+        self.title = title
         self.settings = settings
     }
     
-    public func makeView(_ state: Update) -> some View {
-        T.Interface(settings, wrappedValue: self)
+    public func makeView() -> some View {
+        T.Interface(settings, title: title, wrappedValue: self)
     }
-}
-
-extension Expose where T: DisplayableParameter {
-    public func display() -> some View {
-        ExposeDisplay(exposed: self)
+    
+    public var display: AnyView? {
+        T.display(self)
     }
 }
 
 public protocol ExposableInterface: View {
     associatedtype ParameterType: Exposable
     
+    var title: String? { get }
     var wrappedValue: Expose<ParameterType> { get }
     
-    init(_ settings: ParameterType.Settings?, wrappedValue: Expose<ParameterType>)
+    init(_ settings: ParameterType.Settings?, title: String?, wrappedValue: Expose<ParameterType>)
 }
 
 extension ExposableInterface {
@@ -58,6 +59,12 @@ extension ExposableInterface {
 public protocol Exposable {
     associatedtype Settings
     associatedtype Interface: ExposableInterface where Interface.ParameterType == Self
+    
+    static func display(_ exposed: Expose<Self>) -> AnyView?
+}
+
+extension Exposable {
+    static public func display(_ exposed: Expose<Self>) -> AnyView? { nil }
 }
 
 public struct ExposedWrapper: View {
@@ -71,14 +78,16 @@ public struct ExposedWrapper: View {
         self._state = StateObject(wrappedValue: input.state)
     }
     
-    public var body: some View { AnyView(input.makeView(state)) }
+    public var body: some View { AnyView(input.makeView()) }
+    var display: AnyView? { input.display }
 }
 
 public protocol ExposedParameter: ErasedParameter {
     var id: UUID { get }
     associatedtype Interface: View
     var state: Update { get }
-    func makeView(_ state: Update) -> Interface
+    func makeView() -> Interface
+    var display: AnyView? { get }
 }
 
 public protocol ErasedParameter: AnyObject {

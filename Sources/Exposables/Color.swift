@@ -9,26 +9,23 @@ import SwiftUI
 
 public struct ExposableColor: Exposable {
     var color: SIMD3<Double>
-    public struct Settings {
-        let name: String
-    }
+    public typealias Settings = ()
     
     public struct Interface: ExposableInterface {
+        public var title: String?
         public var wrappedValue: Expose<ExposableColor>
         let settings: Settings?
-        public init(_ settings: ExposableColor.Settings?, wrappedValue: Expose<ExposableColor>) {
+        public init(_ settings: ExposableColor.Settings?, title: String?, wrappedValue: Expose<ExposableColor>) {
             self.settings = settings
             self.wrappedValue = wrappedValue
         }
         
         public typealias ParameterType = ExposableColor
         
-        
-        
         public var body: some View {
             VStack {
-                if let name = settings?.name {
-                    Text(name)
+                if let title {
+                    Text(title)
                 }
                 GeometryReader { geometry in
                     let side = max(min(geometry.size.width, geometry.size.height) / 2 - 10, 10)
@@ -43,10 +40,10 @@ public struct ExposableColor: Exposable {
                                 }))
                             }
                         }
-                        let color = wrappedValue.wrappedValue.color
-                        Circle()
-                            .foregroundColor(Color(red: Double(color.x), green: Double(color.y), blue: Double(color.z)))
-                            .frame(width: side, height: side, alignment: .center)
+//                        let color = wrappedValue.wrappedValue.color
+//                        Circle()
+//                            .foregroundColor(Color(red: Double(color.x), green: Double(color.y), blue: Double(color.z)))
+//                            .frame(width: side, height: side, alignment: .center)
                     }
                 }
             }

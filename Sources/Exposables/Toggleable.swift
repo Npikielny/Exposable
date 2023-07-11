@@ -7,21 +7,16 @@
 
 import SwiftUI
 
-public struct ToggleSettings<ParameterType: ToggleExposable> {
-    let name: String
-    let initialValue: ParameterType
-}
-
 public struct ToggleInterface<ParameterType: ToggleExposable>: ExposableInterface  {
-    let settings: ParameterType.Settings?
-    public var wrappedValue: Expose<ParameterType>
+    public let title: String?
+    public let wrappedValue: Expose<ParameterType>
     
     @StateObject var update = Update()
     let containers: [String: ExposableContainer]
     
-    public init(_ settings: ParameterType.Settings?, wrappedValue: Exposables.Expose<ParameterType>) {
-        self.settings = settings
+    public init(_ settings: ParameterType.Settings?, title: String? = nil, wrappedValue: Exposables.Expose<ParameterType>) {
         self.wrappedValue = wrappedValue
+        self.title = title
         
         containers = [String: ExposableContainer](
             uniqueKeysWithValues: ParameterType.defaults.map {
@@ -32,7 +27,7 @@ public struct ToggleInterface<ParameterType: ToggleExposable>: ExposableInterfac
     
     public var body: some View {
         VStack(alignment: .leading) {
-            let title = settings?.name == nil ? "" : "\((settings?.name)!):"
+            let title = title == nil ? "" : "\((title)!):"
 
             Picker(title, selection: updateBinding) {
                 ForEach(ParameterType.defaults, id: \.optionLabel) {
@@ -48,7 +43,7 @@ public struct ToggleInterface<ParameterType: ToggleExposable>: ExposableInterfac
 }
 
 public protocol ToggleExposable: Exposable, Hashable, Equatable
-where Settings == ToggleSettings<Self>
+where Settings == ()
 {
     /// Label to be displayed per option
     var optionLabel: String { get }

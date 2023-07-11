@@ -9,31 +9,17 @@ import SwiftUI
 
 public class ExposableContainer: ObservableObject {
     @Published public var state = Update()
-    var view: AnyView? = nil
+    var view: (ExposedWrapperSet)? = nil
     
-    public init() {}
+    var displayMethod: Display
+    
+    public init(displayMethod: Display = .inline) {
+        self.displayMethod = displayMethod
+    }
     
     public func compile(_ mirror: Mirror) -> some View {
         if let view = view { return view }
-        let vw = AnyView(mirror.stackExposedViews(mirror))
-        self.view = vw
-        return vw
-    }
-    
-    func compile(exposed: [any ExposedParameter]) -> some View {
-        if let view = view { return view }
-        let vw = AnyView(VStack {
-            ForEach(exposed.map(\.wrapped), id: \.id) {
-                $0
-            }
-        })
-        self.view = vw
-        return vw
-    }
-}
-
-extension Mirror {
-    func stackExposedViews(_ mirror: Mirror) -> some View {
+        
         let exposed = mirror.children
             .compactMap {
                 if let exposed = $0.value as? ErasedParameter {
@@ -43,10 +29,53 @@ extension Mirror {
                 return nil
             }
         
-        return VStack {
-            ForEach(exposed, id: \.id) {
-                $0
+        let vw = construct(exposed: exposed)
+        self.view = vw
+        return vw
+    }
+
+    public func compile(exposed: [any ExposedParameter]) -> some View {
+        if let view { return view }
+        let vw = construct(exposed: exposed.map(\.wrapped))
+        self.view = vw
+        return vw
+    }
+    
+    private func construct(exposed: [ExposedWrapper]) -> ExposedWrapperSet {
+        ExposedWrapperSet(exposed: exposed, displayMethod: displayMethod)
+    }
+    
+    public enum Display {
+        case inline
+        case separated
+        case none
+    }
+    
+    struct ExposedWrapperSet: View {
+        let exposed: [ExposedWrapper]
+        let displayMethod: Display
+        
+        var body: some View {
+            switch displayMethod {
+                case .none:
+                    ForEach(exposed, id: \.id) {
+                        $0
+                    }
+                case .separated:
+                    ForEach(exposed, id: \.id) {
+                        $0
+                    }
+                    Divider()
+                    ForEach(exposed, id: \.id) {
+                        if let display = $0.display { display }
+                    }
+                case .inline:
+                    ForEach(exposed, id: \.id) {
+                        $0
+                        if let display = $0.display { display }
+                    }
             }
         }
     }
+    
 }

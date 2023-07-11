@@ -13,17 +13,23 @@ public protocol ExposableDisplayInterface: View {
     init(_ parameter: ParameterType)
 }
 
-public protocol DisplayableParameter {
+public protocol DisplayableParameter: Exposable {
     associatedtype DisplayInterface: ExposableDisplayInterface where DisplayInterface.ParameterType == Self
 }
 
-struct ExposeDisplay<T: Exposable & DisplayableParameter>: View {
+extension DisplayableParameter {
+    public static func display(_ exposed: Expose<Self>) -> AnyView? {
+        AnyView(ExposeDisplay(exposed: exposed))
+    }
+}
+
+struct ExposeDisplay<T: DisplayableParameter>: View {
     private let exposed: Expose<T>
-    @StateObject var state: Update
+    @ObservedObject var state: Update
     
     init(exposed: Expose<T>) {
         self.exposed = exposed
-        self._state = StateObject(
+        self._state = ObservedObject(
             wrappedValue: exposed.state
         )
         

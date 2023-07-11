@@ -9,11 +9,12 @@ import SwiftUI
 
 struct SwiftUIView: View {
     @Expose var message: String
-    @Expose var color = BackgroundSelect.none
-    @StateObject var container = ExposableContainer()
+    @Expose var color = ColorSelect.red
+    @Expose var myNumber = 0
+    @StateObject var container = ExposableContainer(displayMethod: .separated)
     
     init() {
-        let exposed = Expose(wrappedValue: "", settings: "Insert message")
+        let exposed = Expose(wrappedValue: "", title: "Insert message")
         self._message = exposed
     }
     
@@ -21,9 +22,6 @@ struct SwiftUIView: View {
         VStack {
             Text("Hello, World!")
             container.compile(Mirror(reflecting: self))
-            Text(message)
-            _message.display()
-            _color.display()
         }
         .frame(width: 500, height: 300)
         .padding()
@@ -46,8 +44,7 @@ enum BackgroundSelect: ToggleExposable, DisplayableParameter {
                 case .none:
                     EmptyView()
                 case let .select(color):
-                    Circle()
-                        .foregroundColor(color.wrappedValue.color)
+                    ExposeDisplay(exposed: color)
             }
         }
     }
@@ -79,7 +76,24 @@ enum BackgroundSelect: ToggleExposable, DisplayableParameter {
     }
 }
 
-enum ColorSelect: ToggleExposable {
+enum ColorSelect: ToggleExposable, DisplayableParameter {
+    struct DisplayInterface: ExposableDisplayInterface {
+        var wrapped: ColorSelect
+        
+        init(_ parameter: ColorSelect) {
+            wrapped = parameter
+        }
+        
+        typealias ParameterType = ColorSelect
+        
+        var body: some View {
+            Circle()
+                .foregroundColor(wrapped.color)
+        }
+        
+        
+    }
+    
     typealias Interface = ToggleInterface<ColorSelect>
 
     case red
@@ -137,15 +151,15 @@ extension String: DisplayableParameter {
 }
 
 extension String: Exposable {
-    public typealias Settings = String
+    public typealias Settings = ()
     
     public struct Interface: ExposableInterface {
-        public var wrappedValue: Expose<String>
+        public let title: String?
         
-        let title: Settings?
+        public let wrappedValue: Expose<String>
         @StateObject var state: Update
-        public init(_ settings: String?, wrappedValue: Expose<String>) {
-            title = settings
+        public init(_ settings: ()?, title: String?, wrappedValue: Expose<String>) {
+            self.title = title
             self.wrappedValue = wrappedValue
             self._state = StateObject(wrappedValue: wrappedValue.state)
         }
