@@ -20,7 +20,7 @@ public struct ToggleInterface<ParameterType: ToggleExposable>: ExposableInterfac
         
         containers = [String: ExposableContainer](
             uniqueKeysWithValues: ParameterType.defaults.map {
-                ($0.optionLabel, ExposableContainer())
+                ($0.optionLabel, ExposableContainer(displayMethod: .none))
             }
         )
     }
