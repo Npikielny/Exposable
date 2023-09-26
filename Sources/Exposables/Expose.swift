@@ -9,7 +9,7 @@ import SwiftUI
     public let title: String?
     public var wrappedValue: T
     public let id = UUID()
-    public let shouldShow: () -> Bool
+    public var shouldShow: () -> Bool
     @Published public var state = Update()
     let settings: T.Settings?
     
