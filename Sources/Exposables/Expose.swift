@@ -9,21 +9,28 @@ import SwiftUI
     public let title: String?
     public var wrappedValue: T
     public let id = UUID()
+    public let shouldShow: () -> Bool
     @Published public var state = Update()
     let settings: T.Settings?
     
-    public init(wrappedValue: T, title: String? = nil, settings: T.Settings? = nil) {
+    public init(wrappedValue: T, title: String? = nil, settings: T.Settings? = nil, present: @escaping () -> Bool = { true }) {
         self.wrappedValue = wrappedValue
         self.title = title
         self.settings = settings
+        self.shouldShow = present
     }
     
+    @ViewBuilder
     public func makeView() -> some View {
-        T.Interface(settings, title: title, wrappedValue: self)
+        if shouldShow() {
+            T.Interface(settings, title: title, wrappedValue: self)
+        } else {
+            EmptyView()
+        }
     }
     
     public var display: AnyView? {
-        T.display(self)
+        return shouldShow() ? T.display(self) : nil
     }
 }
 
