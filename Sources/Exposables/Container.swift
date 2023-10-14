@@ -41,6 +41,44 @@ public class ExposableContainer: ObservableObject {
         return vw
     }
     
+    public func compile<T: View, K: View>(
+        mirror: Mirror,
+        customDisplay: () -> T,
+        layout: (ExposedWrapperSet, T) -> K
+    ) -> K {
+        let custom = customDisplay()
+        if let view {
+            return layout(view, custom)
+        }
+        
+        let exposed = mirror.children
+            .compactMap {
+                if let exposed = $0.value as? ErasedParameter {
+                    let wrapped = exposed.wrapped
+                    return wrapped
+                }
+                return nil
+            }
+        
+        let vw = construct(exposed: exposed)
+        self.view = vw
+        return layout(vw, custom)
+    }
+    
+    public func compile<T: View, K: View>(
+        exposed: [any ExposedParameter],
+        customDisplay: () -> T,
+        layout: (ExposedWrapperSet, T) -> K
+    ) -> K {
+        let custom = customDisplay()
+        if let view {
+            return layout(view, custom)
+        }
+        let vw = construct(exposed: exposed.map(\.wrapped))
+        self.view = vw
+        return layout(vw, custom)
+    }
+    
     private func construct(exposed: [ExposedWrapper]) -> ExposedWrapperSet {
         ExposedWrapperSet(exposed: exposed, displayMethod: displayMethod)
     }
@@ -52,11 +90,11 @@ public class ExposableContainer: ObservableObject {
         case onlyDisplay
     }
     
-    struct ExposedWrapperSet: View {
+    public struct ExposedWrapperSet: View {
         let exposed: [ExposedWrapper]
         let displayMethod: Display
         
-        var body: some View {
+        public var body: some View {
             switch displayMethod {
                 case .none:
                     VStack {
