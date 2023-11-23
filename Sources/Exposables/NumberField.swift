@@ -75,6 +75,24 @@ public struct NumberField<Number: Numeric & Comparable>: View {
     }
 }
 
+public struct NumberSlider<Number: Numeric & Comparable>: View {
+    var range: ClosedRange<Double>
+    var title: String?
+    var formatter: NumberFormatter
+    @Binding var value: Double
+    @Binding var preprocessed: Number
+    
+    public var body: some View {
+        HStack {
+            if let title {
+                Text(title)
+            }
+            Slider(value: $value, in: range)
+            Text(formatter.string(for: $preprocessed.wrappedValue) ?? "")
+        }
+    }
+}
+
 extension NumberFormatter {
     static let intFormatter = NumberFormatter()
     static let doubleFormatter: NumberFormatter = {
@@ -98,3 +116,22 @@ struct NumberInput_Previews: PreviewProvider {
     }
 }
 
+#Preview("Sliders") {
+    Group {
+        NumberSlider<Double>(
+            range: 0.0...1.0,
+            title: "My slider",
+            formatter: .doubleFormatter,
+            value: .constant(0.5),
+            preprocessed: .constant(0.5)
+        )
+        
+        NumberSlider<Int>(
+            range: 0...3.0,
+            title: "My slider",
+            formatter: .intFormatter,
+            value: .constant(3),
+            preprocessed: .constant(3)
+        )
+    }.padding()
+}

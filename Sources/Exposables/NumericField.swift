@@ -8,10 +8,16 @@
 import SwiftUI
 
 public protocol NumericExposable: Comparable & Numeric & Exposable, DisplayableParameter {
-    static func numberField(settings: Settings?, title: String?, value: Binding<Self>) -> NumberField<Self>
+    static func numberField(settings: ClosedRange<Self>?, title: String?, value: Binding<Self>) -> NumberField<Self>
+    static func numberSlider(settings: ClosedRange<Self>, title: String?, value: Binding<Self>) -> NumberSlider<Self>
 }
 
-public struct NumberFieldInterface<ParameterType: NumericExposable>: ExposableInterface where ParameterType.Settings == ClosedRange<ParameterType> {
+public enum NumericSettings<Number: Comparable> {
+    case stepper(_ range: ClosedRange<Number>?)
+    case slider(_ range: ClosedRange<Number>)
+}
+
+public struct NumberFieldInterface<ParameterType: NumericExposable>: ExposableInterface where ParameterType.Settings == NumericSettings<ParameterType> {
     public let title: String?
     public let wrappedValue: Expose<ParameterType>
     public let settings: ParameterType.Settings?
@@ -24,7 +30,14 @@ public struct NumberFieldInterface<ParameterType: NumericExposable>: ExposableIn
     }
     
     public var body: some View {
-        ParameterType.numberField(settings: settings, title: title,  value: updateBinding)
+        switch settings {
+            case let .slider(range):
+                ParameterType.numberSlider(settings: range, title: title, value: updateBinding)
+            case let .stepper(range):
+                ParameterType.numberField(settings: range, title: title, value: updateBinding)
+            case .none:
+                ParameterType.numberField(settings: nil, title: title, value: updateBinding)
+        }
     }
 }
 
@@ -40,11 +53,15 @@ extension Double: NumericExposable {
         }
     }
     
-    public static func numberField(settings: Settings?, title: String?, value: Binding<Double>) -> NumberField<Double> {
+    public static func numberField(settings: ClosedRange<Double>?, title: String?, value: Binding<Double>) -> NumberField<Double> {
         NumberField(range: settings, title: title, value: value)
     }
     
-    public typealias Settings = ClosedRange<Double>
+    public static func numberSlider(settings: ClosedRange<Double>, title: String?, value: Binding<Double>) -> NumberSlider<Double> {
+        NumberSlider(range: settings, formatter: .doubleFormatter, value: value, preprocessed: value)
+    }
+    
+    public typealias Settings = NumericSettings<Double>
     public typealias Interface = NumberFieldInterface<Self>
 }
 
@@ -60,10 +77,25 @@ extension Int: NumericExposable {
         }
     }
     
-    public static func numberField(settings: Settings?, title: String?, value: Binding<Int>) -> NumberField<Int> {
+    public static func numberField(settings: ClosedRange<Int>?, title: String?, value: Binding<Int>) -> NumberField<Int> {
         NumberField(range: settings, title: title, value: value)
     }
     
-    public typealias Settings = ClosedRange<Int>
+    public static func numberSlider(settings: ClosedRange<Int>, title: String?, value: Binding<Int>) -> NumberSlider<Int> {
+        let binding = Binding {
+            Double(value.wrappedValue)
+        } set: { newValue in
+            value.wrappedValue = Int(newValue)
+        }
+
+        return NumberSlider<Int>(
+            range: Double(settings.lowerBound)...Double(settings.upperBound),
+            formatter: .intFormatter,
+            value: binding,
+            preprocessed: value
+        )
+    }
+    
+    public typealias Settings = NumericSettings<Int>
     public typealias Interface = NumberFieldInterface<Self>
 }
