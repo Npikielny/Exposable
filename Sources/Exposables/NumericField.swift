@@ -58,7 +58,7 @@ extension Double: NumericExposable {
     }
     
     public static func numberSlider(settings: ClosedRange<Double>, title: String?, value: Binding<Double>) -> NumberSlider<Double> {
-        NumberSlider(range: settings, formatter: .doubleFormatter, value: value, preprocessed: value)
+        NumberSlider(range: settings, title: title, formatter: .doubleFormatter, value: value, preprocessed: value)
     }
     
     public typealias Settings = NumericSettings<Double>
@@ -90,6 +90,7 @@ extension Int: NumericExposable {
 
         return NumberSlider<Int>(
             range: Double(settings.lowerBound)...Double(settings.upperBound),
+            title: title,
             formatter: .intFormatter,
             value: binding,
             preprocessed: value
