@@ -89,6 +89,9 @@ public struct NumberSlider<Number: Numeric & Comparable>: View {
             }
             Slider(value: $value, in: range)
             Text(formatter.string(for: $preprocessed.wrappedValue) ?? "")
+                .lineLimit(nil)
+                .multilineTextAlignment(.trailing)
+                .fixedSize(horizontal: true, vertical: false)
         }
     }
 }
