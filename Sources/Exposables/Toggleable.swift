@@ -38,7 +38,7 @@ public struct ToggleInterface<ParameterType: ToggleExposable>: ExposableInterfac
             
             containers[wrappedValue.wrappedValue.optionLabel]!
                 .compile(exposed: wrappedValue.wrappedValue.subproperties)
-        }
+        }.padding(.vertical)
     }
 }
 

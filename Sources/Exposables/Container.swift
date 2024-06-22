@@ -99,24 +99,24 @@ public class ExposableContainer: ObservableObject {
                 case .none:
                     VStack {
                         ForEach(exposed, id: \.id) {
-                            $0.padding()
+                            $0
                         }
                     }
                 case .separated:
                     VStack {
                         ForEach(exposed, id: \.id) {
-                            $0.padding()
+                            $0
                         }
                         Divider()
                         ForEach(exposed, id: \.id) {
-                            if let display = $0.display { display.padding() }
+                            if let display = $0.display { display }
                         }
                     }
                 case .inline:
                     VStack {
                         ForEach(exposed, id: \.id) {
-                            $0.padding()
-                            if let display = $0.display { display.padding() }
+                            $0
+                            if let display = $0.display { display }
                         }
                     }
                 case .onlyDisplay: info
