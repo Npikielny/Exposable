@@ -88,10 +88,11 @@ public struct NumberSlider<Number: Numeric & Comparable>: View {
                 Text(title)
             }
             Slider(value: $value, in: range)
-            Text(formatter.string(for: $preprocessed.wrappedValue) ?? "")
-                .lineLimit(nil)
-                .multilineTextAlignment(.trailing)
-                .fixedSize(horizontal: true, vertical: false)
+            TextField("", value: $value, formatter: formatter)
+//            Text(formatter.string(for: $preprocessed.wrappedValue) ?? "")
+//                .lineLimit(nil)
+//                .multilineTextAlignment(.trailing)
+//                .fixedSize(horizontal: true, vertical: false)
         }
     }
 }
