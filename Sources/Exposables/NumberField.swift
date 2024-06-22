@@ -61,10 +61,9 @@ public struct NumberField<Number: Numeric & Comparable>: View {
                 Spacer()
             }
             TextField("", value: $value, formatter: formatter)
-                .textFieldStyle(.plain)
+                .textFieldStyle(.roundedBorder)
                 .frame(width: 50)
-                .padding(5)
-                .cornerRadius(5)
+                .padding(.leading, 5)
             Stepper("") {
                 value += 1
             } onDecrement: {
@@ -89,6 +88,8 @@ public struct NumberSlider<Number: Numeric & Comparable>: View {
             }
             Slider(value: $value, in: range)
             TextField("", value: $value, formatter: formatter)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 50)
 //            Text(formatter.string(for: $preprocessed.wrappedValue) ?? "")
 //                .lineLimit(nil)
 //                .multilineTextAlignment(.trailing)
