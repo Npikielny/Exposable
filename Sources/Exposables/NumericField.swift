@@ -9,7 +9,7 @@ import SwiftUI
 
 public protocol NumericExposable: Comparable & Numeric & Exposable, DisplayableParameter {
     static func numberField(settings: ClosedRange<Self>?, title: String?, value: Binding<Self>) -> NumberField<Self>
-    static func numberSlider(settings: ClosedRange<Self>, title: String?, value: Binding<Self>) -> NumberSlider<Self>
+    static func numberSlider(settings: ClosedRange<Self>, title: String?, value: Binding<Self>, formatter: NumberFormatter?) -> NumberSlider<Self>
 }
 
 public enum NumericSettings<Number: Comparable> {
@@ -32,7 +32,7 @@ public struct NumberFieldInterface<ParameterType: NumericExposable>: ExposableIn
     public var body: some View {
         switch settings {
             case let .slider(range):
-                ParameterType.numberSlider(settings: range, title: title, value: updateBinding)
+                ParameterType.numberSlider(settings: range, title: title, value: updateBinding, formatter: nil)
             case let .stepper(range):
                 ParameterType.numberField(settings: range, title: title, value: updateBinding)
             case .none:
@@ -57,8 +57,8 @@ extension Double: NumericExposable {
         NumberField(range: settings, title: title, value: value)
     }
     
-    public static func numberSlider(settings: ClosedRange<Double>, title: String?, value: Binding<Double>) -> NumberSlider<Double> {
-        NumberSlider(range: settings, title: title, formatter: .doubleFormatter, value: value, preprocessed: value)
+    public static func numberSlider(settings: ClosedRange<Double>, title: String?, value: Binding<Double>, formatter: NumberFormatter?) -> NumberSlider<Double> {
+        NumberSlider(range: settings, title: title, formatter: formatter ?? .doubleFormatter, value: value, preprocessed: value)
     }
     
     public typealias Settings = NumericSettings<Double>
@@ -81,7 +81,7 @@ extension Int: NumericExposable {
         NumberField(range: settings, title: title, value: value)
     }
     
-    public static func numberSlider(settings: ClosedRange<Int>, title: String?, value: Binding<Int>) -> NumberSlider<Int> {
+    public static func numberSlider(settings: ClosedRange<Int>, title: String?, value: Binding<Int>, formatter: NumberFormatter?) -> NumberSlider<Int> {
         let binding = Binding {
             Double(value.wrappedValue)
         } set: { newValue in
@@ -91,7 +91,7 @@ extension Int: NumericExposable {
         return NumberSlider<Int>(
             range: Double(settings.lowerBound)...Double(settings.upperBound),
             title: title,
-            formatter: .intFormatter,
+            formatter: formatter ?? .intFormatter,
             value: binding,
             preprocessed: value
         )
